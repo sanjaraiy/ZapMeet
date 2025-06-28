@@ -4,7 +4,10 @@ import cors from 'cors';
 import { HTTPSTATUS } from './config/http.config.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../swagger_output.json' assert { type: 'json' };
-import { error } from 'console';
+import { errorHandler } from './middlewares/errorHandler.js';
+import { asyncHandler } from './middlewares/asyncHandler.js';
+import { BadRequestException } from './utils/app-error.js';
+
 
 const app: Application = express();
 const BASE_PATH = config.BASE_PATH; 
@@ -19,14 +22,17 @@ app.use(cors({
 
 
 // Sample Route
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
-  res.status(HTTPSTATUS.OK).json({
-     message: 'Welcome to the ZapMeet Backend',
-  })
-});
+app.get('/', asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+ 
+   throw new BadRequestException("throwing async error",);
+   res.status(HTTPSTATUS.OK).json({
+      message: 'Welcome to the ZapMeet Backend',
+   })
+ } 
+));
 
 
-
+app.use(errorHandler);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
